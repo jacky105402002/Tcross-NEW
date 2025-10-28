@@ -426,7 +426,7 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 12vh; /* 想再低一點就調這裡，例如 4vh */
+  bottom: 6vh; /* 想再低一點就調這裡，例如 4vh */
   display: grid;
   place-items: center;
   pointer-events: none; /* 讓容器不吃事件 */
@@ -595,7 +595,7 @@ body {
 .score-pill {
   position: absolute;
   left: 50%;
-  top: 65%;
+  top: 80%;
   transform: translateX(-50%);
   width: 200px; /* 與底圖寬度一致 */
   height: 120px; /* 與底圖高度一致 */
@@ -625,8 +625,8 @@ body {
 
 .again-game {
   position: fixed;
-  top: 8%;
-  right: 4.5%;
+  top: 20px;
+  right: 20px;
   background-color: #66bb6a; /* 淺綠色 */
   color: #fff; /* 白色文字 */
   border: none;
