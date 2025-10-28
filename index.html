@@ -132,7 +132,9 @@
       <div class="game-wrap bg-game">
         <div class="stage" id="stage">
           <div class="timer-badge" id="timer">90</div>
-          <div class="score-pill" id="scorePill">分數：0</div>
+          <div class="score-pill">
+            <span class="score-text" id="scorePill">0</span>
+          </div>
 
           <div class="spawn slot-1" id="spawn-1"></div>
           <div class="spawn slot-2" id="spawn-2"></div>
@@ -470,7 +472,7 @@
         const clearTimers = new Set();
 
         const refreshScore = () => {
-          scorePill.textContent = `分數：${score}`;
+          scorePill.textContent = `${score}`;
         };
         const randInt = (min, max) =>
           min + Math.floor(Math.random() * (max - min + 1));
