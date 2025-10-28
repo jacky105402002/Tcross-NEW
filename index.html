@@ -120,6 +120,7 @@
         <button class="img-btn" id="btn-confirm-2">
           <img src="./assets/images/check_off.png" alt="確認" />
         </button>
+        <button class="again-game">重新開始</button>
       </div>
 
       <div class="rotate-mask" id="rotateMask-02">
@@ -132,6 +133,7 @@
       <div class="game-wrap bg-game">
         <div class="stage" id="stage">
           <div class="timer-badge" id="timer">90</div>
+          <button class="again-game">重新開始</button>
           <div class="score-pill">
             <span class="score-text" id="scorePill">0</span>
           </div>
@@ -697,24 +699,22 @@
       });
 
       // === 重新開始按鈕 ===
-      document.addEventListener("DOMContentLoaded", () => {
-        const restartBtn = document.getElementById("btn-restart");
-        if (restartBtn) {
-          restartBtn.addEventListener("click", () => {
-            // 刪除所有 level3_* cookie
-            const cookies = document.cookie.split(";");
-            cookies.forEach((cookie) => {
-              const eqPos = cookie.indexOf("=");
-              const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-              if (name.trim().startsWith("level3_")) {
-                document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-              }
-            });
+      // 用事件委派處理之後才出現的按鈕（保留你的清除邏輯不變）
+      document.addEventListener("click", (e) => {
+        const target = e.target.closest("#btn-restart, .again-game");
+        if (!target) return;
 
-            // 重新整理頁面以回到第一關
-            location.reload();
-          });
-        }
+        // 刪除所有 level3_* cookie（保留你的寫法）
+        const cookies = document.cookie.split(";");
+        cookies.forEach((cookie) => {
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+          if (name.trim().startsWith("level3_")) {
+            document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+          }
+        });
+
+        location.reload();
       });
     </script>
   </body>
