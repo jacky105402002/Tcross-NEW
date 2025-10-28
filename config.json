@@ -1,0 +1,18 @@
+{
+  "pageInfo": {
+    "title": "關卡三｜整併版（1~6頁）",
+    "description": "新版本第三關重構版",
+    "version": "1.0.0",
+    "author": "蔡明傑"
+  },
+  "settings": {
+    "entryFile": "index.html",
+    "autoProgress": false,
+    "progressTrigger": "manual",
+    "allowFullscreen": true,
+    "enableKeyboard": true
+  },
+  "requirements": {
+    "supportedBrowsers": ["chrome", "firefox", "safari", "edge"]
+  }
+}

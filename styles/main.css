@@ -9,34 +9,52 @@ body {
   -webkit-user-select: none;
   user-select: none;
   background: #000;
-}
-
-/* 外層容器：置中 + 安全區 */
+} /* 外層容器：置中 + 安全區 */
 .game-wrap {
   position: relative;
   width: 100vw;
   height: 100vh;
-}
-
-/* 前導頁背景*/
+} /* 前導頁背景*/
 .bg-prelude {
-  background-image: url("../image/1920x1080/prelude.png");
+  background-image: url("../assets/images/1920x1080/prelude.png");
   background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   background-repeat: no-repeat; /* 不重複 */
   background-position: top center; /* 往上靠 */
   background-color: #fff; /* 露出的底色＝白色 */
 }
-
 .bg-02 {
-  background-image: url("../image/1920x1080/02.png");
+  background-image: url("../assets/images/1920x1080/02.png");
   background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
 }
-
 .bg-game {
-  background: #fff url("../image/1920x1080/03.png") center center / cover
-    no-repeat;
+  background: #fff url("../assets/images/1920x1080/03.png") center center /
+    cover no-repeat;
 }
 
+/* 遊戲舞台與出現點：一定要是定位元素，left/top 才有效 */
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+.spawn {
+  position: absolute; /* ← 關鍵：讓 .slot-* 的 left/top 生效 */
+  width: var(--slot-size, 110px);
+  transform: translate(-50%, -50%);
+  display: none; /* 由 JS 控制顯示 */
+  z-index: 3;
+  pointer-events: none;
+}
+
+.spawn > img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: auto;
+  -webkit-user-drag: none;
+  user-select: none;
+  touch-action: manipulation;
+}
 .score-pill {
   position: absolute;
   left: 50%;
@@ -47,25 +65,7 @@ body {
   border-radius: 999px;
   font-size: 32px;
   user-select: none;
-}
-
-/* .timer-badge {
-  position: absolute;
-  left: 4.6%;
-  top: 10.3%;
-  width: min(92px, 10vw);
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background: transparent;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 54px;
-  color: #d60000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  user-select: none;
-} */
-
+} /* .timer-badge { position: absolute; left: 4.6%; top: 10.3%; width: min(92px, 10vw); aspect-ratio: 1 / 1; border-radius: 50%; background: transparent; display: grid; place-items: center; font-weight: 800; font-size: 54px; color: #d60000; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); user-select: none; } */
 .slot-1 {
   left: 15%;
   top: 38%;
@@ -90,7 +90,6 @@ body {
   left: 67%;
   top: 70%;
 } /* 陽光小炒（右下牌位區） */
-
 #num-cut {
   left: 36%;
   top: 52%;
@@ -105,26 +104,21 @@ body {
   left: 50%;
   top: 70%;
   font-size: 60px;
-}
-
-/*電腦*/
+} /*電腦*/
 @media (max-width: 1921px) {
   /* 前導頁背景*/
   .bg-prelude {
-    background-image: url("../image/1920x1080/prelude.png");
+    background-image: url("../assets/images/1920x1080/prelude.png");
     background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   }
-
   .bg-02 {
-    background-image: url("../image/1920x1080/02.png");
+    background-image: url("../assets/images/1920x1080/02.png");
     background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   }
-
   .bg-game {
-    background: #fff url("../image/1920x1080/03.png") center center / cover
-      no-repeat;
+    background: #fff url("../assets/images/1920x1080/03.png") center center /
+      cover no-repeat;
   }
-
   .score-pill {
     position: absolute;
     left: 50%;
@@ -136,11 +130,10 @@ body {
     font-size: 32px;
     user-select: none;
   }
-
   .timer-badge {
     position: absolute;
-    left: 4.6%;
-    top: 10.3%;
+    left: 4.7%;
+    top: 10.8%;
     width: min(92px, 10vw);
     aspect-ratio: 1 / 1;
     border-radius: 50%;
@@ -153,32 +146,30 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     user-select: none;
   }
-
   .slot-1 {
     left: 15%;
-    top: 38%;
+    top: 35%;
   } /* 珍珠奶茶 攤位左圓 */
   .slot-2 {
     left: 29%;
-    top: 33%;
+    top: 31%;
   } /* 珍珠奶茶 攤位右圓 */
   .slot-3 {
     left: 45%;
-    top: 31%;
+    top: 29%;
   } /* 滷肉飯 左圓 */
   .slot-4 {
     left: 61.8%;
-    top: 30%;
+    top: 26%;
   } /* 滷肉飯 右圓 */
   .slot-5 {
     left: 73%;
-    top: 27%;
+    top: 25%;
   } /* 米粉湯 圓 */
   .slot-6 {
     left: 67%;
     top: 70%;
   } /* 陽光小炒（右下牌位區） */
-
   #num-cut {
     left: 36%;
     top: 52%;
@@ -190,35 +181,28 @@ body {
     font-size: 60px;
   }
   .total {
-    left: 50%;
-    top: 70%;
+    left: 51%;
+    top: 73%;
     font-size: 60px;
-  }
-
-  /* 非全螢幕時 */
+  } /* 非全螢幕時 */
   .not-fullscreen .total {
     top: 73% !important;
   }
-}
-
-/*桌機*/
+} /*桌機*/
 @media (max-width: 1441px) {
   /* 前導頁背景*/
   .bg-prelude {
-    background-image: url("../image/1440x900/prelude.png");
+    background-image: url("../assets/images/1440x900/prelude.png");
     background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   }
-
   .bg-02 {
-    background-image: url("../image/1440x900/02.png");
+    background-image: url("../assets/images/1440x900/02.png");
     background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   }
-
   .bg-game {
-    background: #fff url("../image/1440x900/03.png") center center / cover
-      no-repeat;
+    background: #fff url("../assets/images/1440x900/03.png") center center /
+      cover no-repeat;
   }
-
   .score-pill {
     position: absolute;
     left: 50%;
@@ -230,13 +214,11 @@ body {
     font-size: 26px;
     user-select: none;
   }
-
   .timer-badge {
     left: 3.8%;
     top: 18.3%;
     font-size: 48px;
   }
-
   .slot-1 {
     left: 16%;
     top: 39%;
@@ -276,26 +258,21 @@ body {
     top: 70%;
     font-size: 54px;
   }
-}
-
-/*中筆電*/
+} /*中筆電*/
 @media (max-width: 1367px) {
   /* 前導頁背景*/
   .bg-prelude {
-    background-image: url("../image/1366x768/prelude.png");
+    background-image: url("../assets/images/1366x768/prelude.png");
     background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   }
-
   .bg-02 {
-    background-image: url("../image/1366x768/02.png");
+    background-image: url("../assets/images/1366x768/02.png");
     background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   }
-
   .bg-game {
-    background: #fff url("../image/1366x768/03.png") center center / cover
-      no-repeat;
+    background: #fff url("../assets/images/1366x768/03.png") center center /
+      cover no-repeat;
   }
-
   .score-pill {
     position: absolute;
     left: 50%;
@@ -307,13 +284,11 @@ body {
     font-size: 20px;
     user-select: none;
   }
-
   .timer-badge {
     left: 3.7%;
     top: 14.5%;
     font-size: 40px;
   }
-
   .slot-1 {
     left: 15%;
     top: 35%;
@@ -338,7 +313,6 @@ body {
     left: 67%;
     top: 70%;
   } /* 陽光小炒（右下牌位區） */
-
   #num-cut {
     left: 36%;
     top: 52%;
@@ -354,26 +328,21 @@ body {
     top: 70%;
     font-size: 48px;
   }
-}
-
-/*小筆電*/
+} /*小筆電*/
 @media (max-width: 1281px) {
   /* 前導頁背景*/
   .bg-prelude {
-    background-image: url("../image/1280x720/prelude.png");
+    background-image: url("../assets/images/1280x720/prelude.png");
     background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   }
-
   .bg-02 {
-    background-image: url("../image/1280x720/02.png");
+    background-image: url("../assets/images/1280x720/02.png");
     background-size: 100% auto; /* 寬度等於視窗寬，高度等比 */
   }
-
   .bg-game {
-    background: #fff url("../image/1280x720/03.png") center center / cover
-      no-repeat;
+    background: #fff url("../assets/images/1280x720/03.png") center center /
+      cover no-repeat;
   }
-
   .score-pill {
     position: absolute;
     left: 50%;
@@ -385,13 +354,11 @@ body {
     font-size: 20px;
     user-select: none;
   }
-
   .timer-badge {
     left: 3.5%;
     top: 14.3%;
     font-size: 40px;
   }
-
   .slot-1 {
     left: 15%;
     top: 35%;
@@ -416,7 +383,6 @@ body {
     left: 67%;
     top: 70%;
   } /* 陽光小炒（右下牌位區） */
-
   #num-cut {
     left: 36%;
     top: 52%;
@@ -432,23 +398,17 @@ body {
     top: 70%;
     font-size: 48px;
   }
-}
-
-/* 第二、三頁：簡單素色（可自行替換） */
+} /* 第二、三頁：簡單素色（可自行替換） */
 .plain-bg {
   background: #f6fbff;
-}
-
-/* 中央內容 */
+} /* 中央內容 */
 .center-area {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
   padding: 24px;
-}
-
-/* 圖片按鈕樣式 */
+} /* 圖片按鈕樣式 */
 .img-btn {
   display: inline-block;
   border: 0;
@@ -461,9 +421,7 @@ body {
 .img-btn img {
   display: block;
   width: min(180px, 18vw); /* 原本 220px → 改小一些 */
-}
-
-/* 專門把按鈕固定在下方置中 */
+} /* 專門把按鈕固定在下方置中 */
 .btn-row {
   position: absolute;
   left: 0;
@@ -476,14 +434,11 @@ body {
 .btn-row .img-btn {
   pointer-events: auto;
 }
-
 @media (min-width: 1280px) {
   .img-btn img {
     width: 160px;
   }
-}
-
-/* 提示頁結構 */
+} /* 提示頁結構 */
 .hint-board {
   position: absolute;
   inset: 0;
@@ -515,16 +470,13 @@ body {
   align-items: center; /* 垂直置中 */
   justify-content: center; /* 水平置中 */
   text-align: center;
-
   font-size: clamp(14px, 1.8vw, 22px);
   line-height: 1.8;
   color: #333;
 }
 .hint-text strong {
   color: #d4371c;
-}
-
-/* 直式旋轉提示（手機/平板直向時覆蓋） */
+} /* 直式旋轉提示（手機/平板直向時覆蓋） */
 .rotate-mask {
   position: fixed;
   inset: 0;
@@ -541,90 +493,101 @@ body {
   text-align: center;
   padding: 24px;
   font-size: clamp(18px, 3vw, 28px);
-}
-
-/* 大螢幕（電腦）維持全畫面 */
+} /* 大螢幕（電腦）維持全畫面 */
 @media (min-width: 1025px) {
   .img-btn img {
     width: 220px;
   }
-}
-
-/* === 游標最小補丁：確保整個畫面都用同一個游標 === */
-/* PNG + CUR 做雙重備援；6 2 為熱點可微調 */
+} /* === 游標修正版：確保整個畫面都維持同一個游標 === */ /* PNG + CUR 雙重備援；6 2 為熱點可微調 (建議圖片 ≤128×128px) */
 :root {
-  --cursor-img: url("../image/mouse.png") 6 2, url("../image/mouse.cur"), auto;
-}
-
-/* 讓根節點與覆蓋整頁的容器都強制使用自訂游標 */
-html, body,
-.game-wrap,          /* 你整頁的外層容器 */
-.stage,              /* 遊戲舞台（若有） */
-.btn-row,            /* 底部按鈕容器 */
-.rotate-mask {
-  /* 直式遮罩整層 */
+  --cursor-img: url("../assets/images/mouse.png") 6 2, auto; /* 移除 .cur */
+} /* 套用到所有會覆蓋整頁或被滑鼠命中的主要容器 */
+html, body, .game-wrap, /* 全頁外層容器 */ .stage, /* 遊戲主舞台 */ .bg-game, /* 背景圖層，避免命中背景時回退預設游標 */ .btn-row, /* 底部按鈕列容器 */ .btn-row *, /* 按鈕列中的所有子項 */ .rotate-mask /* 旋轉提示遮罩 */ {
   cursor: var(--cursor-img) !important;
-}
-
-/* 全部子節點預設「繼承」上層游標，避免被 UA/元件 reset 成 auto/pointer */
-*,
-*::before,
-*::after {
-  cursor: inherit !important;
-}
-
-/* 只有輸入框保留 I-beam（你沒有表單的話可刪） */
+} /* 若有額外可互動層，也可在這裡補上 */ /* .overlay-layer, .modal, .modal * { cursor: var(--cursor-img) !important; } */ /* 只有輸入框保留 I-beam（若頁面沒有表單可刪） */
 input,
 textarea {
   cursor: text !important;
-}
-
-/* 文字描邊提示：白字 + 描邊，非圓形框 */
+} /* 文字描邊提示：白字 + 描邊，非圓形框 */
 .score-hint {
   position: fixed;
   left: 0;
   top: 0;
-  transform: translate(-50%, -50%);
-  /* 你要的大約 150x150 視覺量體 → 用字級控制 */
+  transform: translate(
+    -50%,
+    -50%
+  ); /* 你要的大約 150x150 視覺量體 → 用字級控制 */
   font-size: 72px; /* 可依需求調整 */
   font-weight: 700;
   line-height: 1;
   color: #fff; /* 文字填色 */
   pointer-events: none;
-  z-index: 9999;
-
-  /* 動畫 */
+  z-index: 9999; /* 動畫 */
   opacity: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-
-  /* WebKit 真描邊 */
+  transition: opacity 0.2s ease, transform 0.2s ease; /* WebKit 真描邊 */
   -webkit-text-stroke-width: 3px;
-  -webkit-text-stroke-color: #20c76f; /* 預設綠描邊（正分） */
-
-  /* 其它瀏覽器的描邊退場方案：多層陰影疊出描邊 */
+  -webkit-text-stroke-color: #20c76f; /* 預設綠描邊（正分） */ /* 其它瀏覽器的描邊退場方案：多層陰影疊出描邊 */
   text-shadow: 1px 0 0 #20c76f, -1px 0 0 #20c76f, 0 1px 0 #20c76f,
     0 -1px 0 #20c76f, 1px 1px 0 #20c76f, -1px 1px 0 #20c76f, 1px -1px 0 #20c76f,
     -1px -1px 0 #20c76f, 2px 0 0 #20c76f, -2px 0 0 #20c76f, 0 2px 0 #20c76f,
-    0 -2px 0 #20c76f;
-
-  /* 讓白字更立體一點（可選） */
+    0 -2px 0 #20c76f; /* 讓白字更立體一點（可選） */
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.2));
-}
-
-/* 正分：綠描邊 */
+} /* 正分：綠描邊 */
 .score-hint.pos {
   -webkit-text-stroke-color: #20c76f;
   text-shadow: 1px 0 0 #20c76f, -1px 0 0 #20c76f, 0 1px 0 #20c76f,
     0 -1px 0 #20c76f, 1px 1px 0 #20c76f, -1px 1px 0 #20c76f, 1px -1px 0 #20c76f,
     -1px -1px 0 #20c76f, 2px 0 0 #20c76f, -2px 0 0 #20c76f, 0 2px 0 #20c76f,
     0 -2px 0 #20c76f;
-}
-
-/* 負分：紅描邊 */
+} /* 負分：紅描邊 */
 .score-hint.neg {
   -webkit-text-stroke-color: #e53935;
   text-shadow: 1px 0 0 #e53935, -1px 0 0 #e53935, 0 1px 0 #e53935,
     0 -1px 0 #e53935, 1px 1px 0 #e53935, -1px 1px 0 #e53935, 1px -1px 0 #e53935,
     -1px -1px 0 #e53935, 2px 0 0 #e53935, -2px 0 0 #e53935, 0 2px 0 #e53935,
     0 -2px 0 #e53935;
+} /* 原本：會把整個容器的點擊吃掉，子元素也點不到 */ /* .btn-row { position: absolute; left: 0; right: 0; bottom: 6vh; display: grid; place-items: center; } */ /* 加上這段保險（壓過舊規則），也把層級墊高避免被背景擋住 */
+.btn-row {
+  pointer-events: auto !important;
+  z-index: 1000; /* 讓按鈕在最上層 */
+}
+.btn-row .img-btn {
+  pointer-events: auto !important;
+} /* 讓第 1 頁的按鈕列可點，並壓在最上層 */
+[data-screen="l3-01-intro"] .btn-row {
+  pointer-events: auto !important;
+  position: fixed; /* 免得被背景佔滿擠到不可點位置 */
+  left: 0;
+  right: 0;
+  bottom: 6vh;
+  display: grid;
+  place-items: center;
+  z-index: 9999 !important;
+}
+[data-screen="l3-01-intro"] .btn-row .img-btn {
+  pointer-events: auto !important;
+} /* 保險：桌機或橫向時，確保遮罩不會蓋住 */
+@media (orientation: landscape) {
+  #rotateMask-01 {
+    display: none !important;
+  }
+} /* 全域：滿版不可捲動（Safari 需要 -webkit-user-select） */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none; /* ← 新增 */
+  user-select: none;
+  background: #000;
+} /* 有這兩個也補上（出現在多個媒體查詢中就都加） */
+.score-pill {
+  -webkit-user-select: none; /* ← 新增 */
+  user-select: none;
+}
+.timer-badge {
+  -webkit-user-select: none; /* ← 新增 */
+  user-select: none;
 }
