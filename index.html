@@ -195,8 +195,11 @@
       <div class="game-wrap bg-end-03">
         <!-- ✅ 新增重新開始按鈕 -->
         <div class="btn-row">
-          <button class="img-btn" id="btn-restart">
+          <!--           <button class="img-btn" id="btn-restart">
             <img src="./assets/images/check_off.png" alt="重新開始" />
+          </button> -->
+          <button id="nextButton" hidden>
+            <img src="./assets/images/check_off.png" alt="下一步" />下一步
           </button>
         </div>
       </div>
@@ -209,7 +212,7 @@
     </section>
 
     <!-- PlayBoard 下一步：預設 hidden；第 6 頁才會顯示 -->
-    <button id="nextButton" hidden>下一步</button>
+    <!-- <button id="nextButton" hidden>下一步</button> -->
 
     <!-- 進度控制（只處理 PlayBoard 通訊 & 下一步） -->
     <script src="assets/js/playboard.js"></script>
