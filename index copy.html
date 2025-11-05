@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8" />
+    <title>關卡三｜整併版（1~6頁）</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <!-- 套用你提供的 CSS -->
+    <link rel="stylesheet" href="./styles/main.css" />
+
+    <!-- 補丁：目前 main.css 缺的必要樣式（可之後移回 main.css），確保 4~6 背景與遊戲座標正常 -->
+    <style>
+      /* 1) 單頁多畫面顯示控制 */
+      .screen {
+        display: none;
+      }
+      .screen.is-active {
+        display: block;
+      }
+
+      /* 2) 遊戲舞台/出現點：讓 .slot-* 的 left/top 生效 */
+      .stage {
+        position: absolute;
+        inset: 0;
+      }
+      .spawn {
+        position: absolute; /* ← 關鍵：非 static 才吃得到 left/top */
+        width: var(--slot-size, 110px);
+        transform: translate(-50%, -50%);
+        display: none; /* 由 JS 控制顯示/隱藏 */
+        z-index: 3;
+        pointer-events: none;
+      }
+      .spawn > img {
+        width: 100%;
+        height: auto;
+        display: block;
+        pointer-events: auto;
+        -webkit-user-drag: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+      @media (min-width: 1600px) {
+        .spawn {
+          --slot-size: 120px;
+        }
+      }
+      @media (max-width: 1440px) {
+        .spawn {
+          --slot-size: 95px;
+        }
+      }
+      @media (max-width: 1280px) {
+        .spawn {
+          --slot-size: 88px;
+        }
+      }
+
+      /* 3) 第 4～6 頁背景圖（依你的新目錄結構） */
+      .bg-end-01 {
+        background: #fff url("./assets/images/1280x720/end-01.png") center/cover
+          no-repeat;
+      }
+      .bg-end-02 {
+        background: #fff url("./assets/images/1280x720/end-02.png") center/cover
+          no-repeat;
+      }
+      .bg-end-03 {
+        background: #fff url("./assets/images/1280x720/end-03.png") center/cover
+          no-repeat;
+      }
+
+      /* 4) PlayBoard 下一步：預設隱藏，進到第 6 頁再顯示 */
+      #nextButton[hidden] {
+        display: none;
+      }
+
+      /* 讓放數字的容器成為定位參考點 */
+      .result-wrap {
+        position: relative; /* ← 關鍵：以它為基準定位三個數字 */
+        inset: 0; /* 你若想讓它充滿 .game-wrap，可加上這行，或保留原本 absolute+inset:0 也行 */
+        width: 100%;
+        height: 100%;
+      }
+
+      /* 三個數字用絕對定位（只需要在 base 規則設一次即可） */
+      #num-cut,
+      #num-add,
+      .total {
+        position: absolute; /* ← 關鍵：非 static 才吃得到 left/top */
+        transform: translate(-50%, -50%);
+        z-index: 5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Page 1 -->
+    <section id="screen-1" class="screen is-active" data-screen="l3-01-intro">
+      <div class="game-wrap bg-prelude"></div>
+
+      <div class="btn-row">
+        <button class="img-btn" id="btn-confirm">
+          <img src="./assets/images/check_off.png" alt="確認" />
+        </button>
+      </div>
+
+      <div class="rotate-mask" id="rotateMask-01">
+        <div class="rotate-box"><p>請將裝置旋轉為橫向以獲得最佳體驗</p></div>
+      </div>
+    </section>
+
+    <!-- Page 2 -->
+    <section id="screen-2" class="screen" data-screen="l3-02-hint">
+      <div class="game-wrap bg-02"></div>
+
+      <div class="btn-row">
+        <button class="img-btn" id="btn-confirm-2">
+          <img src="./assets/images/check_off.png" alt="確認" />
+        </button>
+        <button class="again-game">重新開始</button>
+      </div>
+
+      <div class="rotate-mask" id="rotateMask-02">
+        <div class="rotate-box"><p>請將裝置旋轉為橫向以獲得最佳體驗</p></div>
+      </div>
+    </section>
+
+    <!-- Page 3 -->
+    <section id="screen-3" class="screen" data-screen="l3-03-game">
+      <div class="game-wrap bg-game">
+        <div class="stage" id="stage">
+          <div class="timer-badge" id="timer">90</div>
+          <button class="again-game">重新開始</button>
+          <div class="score-pill">
+            <span class="score-text" id="scorePill">0</span>
+          </div>
+
+          <div class="spawn slot-1" id="spawn-1"></div>
+          <div class="spawn slot-2" id="spawn-2"></div>
+          <div class="spawn slot-3" id="spawn-3"></div>
+          <div class="spawn slot-4" id="spawn-4"></div>
+          <div class="spawn slot-5" id="spawn-5"></div>
+          <div class="spawn slot-6" id="spawn-6"></div>
+        </div>
+      </div>
+
+      <div class="rotate-mask" id="rotateMask-03">
+        <div class="rotate-box"><p>請將裝置旋轉為橫向以獲得最佳體驗</p></div>
+      </div>
+    </section>
+
+    <!-- Page 4 -->
+    <section id="screen-4" class="screen" data-screen="l3-04-result-1">
+      <div class="game-wrap bg-end-01">
+        <div class="result-wrap">
+          <div class="cols">
+            <div class="card"><div class="num" id="num-cut">0</div></div>
+            <div class="card"><div class="num" id="num-add">0</div></div>
+          </div>
+          <div class="total"><span id="num-total">0</span></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="img-btn" id="btn-confirm-4">
+          <img src="./assets/images/check_off.png" alt="下一頁" />
+        </button>
+      </div>
+
+      <div class="rotate-mask" id="rotateMask-04">
+        <div class="rotate-box"><p>請將裝置旋轉為橫向以獲得最佳體驗</p></div>
+      </div>
+    </section>
+
+    <!-- Page 5 -->
+    <section id="screen-5" class="screen" data-screen="l3-05-result-2">
+      <div class="game-wrap bg-end-02"></div>
+
+      <div class="btn-row">
+        <button class="img-btn" id="btn-confirm-5">
+          <img src="./assets/images/check_off.png" alt="下一頁" />
+        </button>
+      </div>
+
+      <div class="rotate-mask" id="rotateMask-05">
+        <div class="rotate-box"><p>請將裝置旋轉為橫向以獲得最佳體驗</p></div>
+      </div>
+    </section>
+
+    <!-- Page 6 -->
+    <section id="screen-6" class="screen" data-screen="l3-06-result-3">
+      <div class="game-wrap bg-end-03">
+        <!-- ✅ 新增重新開始按鈕 -->
+        <div class="btn-row">
+          <button class="img-btn" id="btn-restart">
+            <img src="./assets/images/check_off.png" alt="重新開始" />
+          </button>
+        </div>
+      </div>
+
+      <div class="rotate-mask" id="rotateMask-06">
+        <div class="rotate-box">
+          <p>請將裝置旋轉為橫向以獲得最佳體驗</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PlayBoard 下一步：預設 hidden；第 6 頁才會顯示 -->
+    <button id="nextButton" hidden>下一步</button>
+
+    <!-- PlayBoard 進度控制 -->
+    <script>
+      class PlayBoardProgress {
+        constructor() {
+          this.isCompleted = false;
+          this.startTime = Date.now();
+          this.setupNextButton();
+        }
+        setupNextButton() {
+          const n = document.getElementById("nextButton");
+          if (n) n.addEventListener("click", () => this.completePage());
+        }
+        showNextButton() {
+          const n = document.getElementById("nextButton");
+          if (n) {
+            n.hidden = false;
+            n.style.display = "block";
+          }
+        }
+        completePage(score = 100, customData = {}) {
+          if (this.isCompleted) return;
+          this.isCompleted = true;
+          const timeSpent = Math.round((Date.now() - this.startTime) / 1000);
+          window.parent.postMessage(
+            {
+              type: "CUSTOM_PAGE_PROGRESS",
+              action: "complete",
+              data: {
+                completed: true,
+                score,
+                timeSpent,
+                attempts: 1,
+                customData,
+              },
+            },
+            "*"
+          );
+        }
+        updateProgress(progress, customData = {}) {
+          window.parent.postMessage(
+            {
+              type: "CUSTOM_PAGE_PROGRESS",
+              action: "update",
+              data: { progress, customData },
+            },
+            "*"
+          );
+        }
+      }
+      window.playboard = new PlayBoardProgress();
+    </script>
+
+    <!-- 單檔流程與工具（無全螢幕） -->
+    <script>
+      /* ===== Cookie / 工具 ===== */
+      function setCookie(name, value, opts = {}) {
+        const enc = encodeURIComponent;
+        let cookie = `${enc(name)}=${enc(value)}`;
+        cookie += `; path=${opts.path || "/"}`;
+        cookie += `; samesite=${opts.sameSite || "Lax"}`;
+        if (opts.secure ?? location.protocol === "https:") cookie += "; Secure";
+        document.cookie = cookie;
+      }
+      function getCookie(name) {
+        const enc = encodeURIComponent(name) + "=";
+        return (
+          document.cookie
+            .split("; ")
+            .find((r) => r.startsWith(enc))
+            ?.split("=")
+            .slice(1)
+            .join("=") || ""
+        );
+      }
+      function bindPressSwap(selector, onSrc, offSrc, onClick) {
+        const btn = document.querySelector(selector);
+        if (!btn) return;
+        const img = btn.querySelector("img");
+        const on = () => {
+          if (img) img.src = onSrc;
+        };
+        const off = () => {
+          if (img) img.src = offSrc;
+        };
+        btn.addEventListener("mousedown", on);
+        btn.addEventListener("mouseup", off);
+        btn.addEventListener("mouseleave", off);
+        btn.addEventListener("touchstart", on, { passive: true });
+        btn.addEventListener("touchend", off, { passive: true });
+        btn.addEventListener("touchcancel", off, { passive: true });
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          onClick?.();
+        });
+      }
+      function handleOrientationMask(maskId) {
+        const mask = document.getElementById(maskId);
+        if (!mask) return;
+        const apply = () => {
+          const isPortrait = window.matchMedia(
+            "(orientation: portrait)"
+          ).matches;
+          const isMobile = /Android|iPhone|iPad|iPod/i.test(
+            navigator.userAgent
+          );
+          mask.style.display = isMobile && isPortrait ? "block" : "none";
+        };
+        apply();
+        window.addEventListener("orientationchange", apply);
+        window.addEventListener("resize", apply);
+      }
+
+      /* ===== 畫面切換 ===== */
+      const screens = [1, 2, 3, 4, 5, 6].map((n) =>
+        document.getElementById(`screen-${n}`)
+      );
+      function go(which) {
+        screens.forEach((el, idx) => {
+          const active = idx + 1 === which;
+          el.classList.toggle("is-active", active);
+          el.style.display = active ? "block" : "none";
+        });
+        handleOrientationMask(`rotateMask-0${which}`);
+        if (which === 6) {
+          setCookie("level3_06", "true", { path: "/", sameSite: "Lax" });
+          window.playboard?.updateProgress(100, { stage: "l3-06-enter" });
+          window.playboard?.showNextButton();
+        }
+      }
+
+      /* ===== 流程守門（只回擋） ===== */
+      function guardFlow() {
+        const p1ok = getCookie("level3_01") === "true";
+        const p2ok = getCookie("level3_02") === "true";
+        const p3ok = getCookie("level3_03") === "true";
+        const p4ok = getCookie("level3_04") === "true";
+        const p5ok = getCookie("level3_05") === "true";
+        const hasScore = !Number.isNaN(Number(getCookie("level3_score")));
+        if (!p1ok) return go(1);
+        if (!p2ok) return go(2);
+        if (!p3ok || !hasScore) return go(3);
+        if (!p4ok) return go(4);
+        if (!p5ok) return go(5);
+        return go(6);
+      }
+
+      /* ===== Page 1 → 2 ===== */
+      bindPressSwap(
+        "#btn-confirm",
+        "./assets/images/check_on.png",
+        "./assets/images/check_off.png",
+        () => {
+          setCookie("level3_01", "true", { path: "/", sameSite: "Lax" });
+          go(2);
+        }
+      );
+
+      /* ===== Page 2 → 3 ===== */
+      bindPressSwap(
+        "#btn-confirm-2",
+        "./assets/images/check_on.png",
+        "./assets/images/check_off.png",
+        () => {
+          setCookie("level3_02", "true", { path: "/", sameSite: "Lax" });
+          go(3);
+          startGameIfNeeded();
+        }
+      );
+
+      /* ===== Page 3（遊戲） ===== */
+      let gameStarted = false;
+      function startGameIfNeeded() {
+        if (gameStarted) return;
+        gameStarted = true;
+
+        const DEBUG_HOTSPOTS = false;
+        if (DEBUG_HOTSPOTS) document.body.classList.add("show-hotspots");
+
+        handleOrientationMask("rotateMask-03");
+
+        function makeSfxPool(url, size = 4) {
+          const pool = Array.from({ length: size }, () => {
+            const a = new Audio(url);
+            a.preload = "auto";
+            a.crossOrigin = "anonymous";
+            return a;
+          });
+          let idx = 0;
+          return {
+            play() {
+              const a = pool[idx];
+              try {
+                a.currentTime = 0;
+              } catch (e) {}
+              a.play().catch(() => {});
+              idx = (idx + 1) % pool.length;
+            },
+            prime() {
+              const a = pool[0];
+              const v = a.volume;
+              a.volume = 0;
+              a.play()
+                .then(() => {
+                  a.pause();
+                  a.currentTime = 0;
+                  a.volume = v;
+                })
+                .catch(() => {});
+            },
+          };
+        }
+        const SFX = {
+          success: makeSfxPool("./assets/images/success.mp3", 6),
+          error: makeSfxPool("./assets/images/error.mp3", 6),
+        };
+        function unlockAudioOnce() {
+          SFX.success.prime();
+          SFX.error.prime();
+          window.removeEventListener("pointerdown", unlockAudioOnce);
+          window.removeEventListener("touchstart", unlockAudioOnce);
+          window.removeEventListener("click", unlockAudioOnce);
+        }
+        window.addEventListener("pointerdown", unlockAudioOnce, { once: true });
+        window.addEventListener("touchstart", unlockAudioOnce, { once: true });
+        window.addEventListener("click", unlockAudioOnce, { once: true });
+
+        const GAME_SECONDS = 90;
+        const SHOW_MS = 2000;
+
+        const ADD_ITEMS = [
+          { src: "./assets/images/add_1.png", score: +2 },
+          { src: "./assets/images/add_2.png", score: +2 },
+          { src: "./assets/images/add_3.png", score: +2 },
+          { src: "./assets/images/add_4.png", score: +3 },
+          { src: "./assets/images/add_5.png", score: +3 },
+          { src: "./assets/images/add_6.png", score: +3 },
+        ];
+        const CUT_ITEMS = [
+          { src: "./assets/images/cut_1.png", score: -1 },
+          { src: "./assets/images/cut_2.png", score: -1 },
+          { src: "./assets/images/cut_3.png", score: -1 },
+          { src: "./assets/images/cut_4.png", score: -1 },
+          { src: "./assets/images/cut_5.png", score: -1 },
+          { src: "./assets/images/cut_6.png", score: -2 },
+        ];
+        [...ADD_ITEMS, ...CUT_ITEMS].forEach((it) => {
+          const i = new Image();
+          i.src = it.src;
+        });
+
+        const spawns = [...document.querySelectorAll(".spawn")];
+        const timerEl = document.getElementById("timer");
+        const scorePill = document.getElementById("scorePill");
+
+        let score = 0,
+          addSum = 0,
+          cutSumNeg = 0;
+        let timeLeft = GAME_SECONDS;
+        let playing = true;
+        let tickTimer = null;
+        const clearTimers = new Set();
+
+        const refreshScore = () => {
+          scorePill.textContent = `${score}`;
+        };
+        const randInt = (min, max) =>
+          min + Math.floor(Math.random() * (max - min + 1));
+        const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const getEmptySpawns = () => spawns.filter((s) => !s.firstElementChild);
+
+        function getCountForElapsed(elapsed) {
+          if (elapsed < 30) return randInt(1, 2);
+          else if (elapsed < 60) return randInt(2, 3);
+          else return randInt(3, 5);
+        }
+
+        function spawnOne() {
+          const empties = getEmptySpawns();
+          if (!empties.length) return false;
+          const slot = pick(empties);
+          const isAdd = Math.random() < 0.5;
+          const item = isAdd ? pick(ADD_ITEMS) : pick(CUT_ITEMS);
+
+          const img = document.createElement("img");
+          img.src = item.src;
+          img.alt =
+            item.score > 0 ? `加 ${item.score}` : `扣 ${Math.abs(item.score)}`;
+          img.dataset.delta = String(item.score);
+          img.addEventListener("pointerdown", onHit, { once: true });
+
+          slot.appendChild(img);
+          slot.style.display = "block";
+
+          const t = setTimeout(() => {
+            if (slot.firstElementChild === img) {
+              slot.replaceChildren();
+              slot.style.display = "none";
+            }
+            clearTimers.delete(t);
+          }, SHOW_MS);
+          clearTimers.add(t);
+          return true;
+        }
+
+        function spawnRound(elapsed) {
+          if (!playing) return;
+          const count = getCountForElapsed(elapsed);
+          for (let i = 0; i < count; i++) {
+            if (!spawnOne()) break;
+          }
+        }
+
+        function startCountdown() {
+          timerEl.textContent = timeLeft;
+          spawnRound(0);
+          const ROUND_INTERVAL = 2000;
+          tickTimer = setInterval(() => {
+            timeLeft -= ROUND_INTERVAL / 1000;
+            if (timeLeft <= 0) {
+              timerEl.textContent = 0;
+              gameOver();
+              return;
+            }
+            timerEl.textContent = Math.ceil(timeLeft);
+            const elapsed = GAME_SECONDS - timeLeft;
+            spawnRound(elapsed);
+          }, ROUND_INTERVAL);
+        }
+
+        function onHit(e) {
+          if (!playing) return;
+          const delta = Number(e.currentTarget.dataset.delta || 0);
+          score += delta;
+          if (delta > 0) {
+            addSum += delta;
+            SFX.success.play();
+          } else {
+            cutSumNeg += delta;
+            SFX.error.play();
+          }
+          refreshScore();
+          showScoreHint(e, delta);
+          const parent = e.currentTarget.parentElement;
+          if (parent) {
+            parent.style.display = "none";
+            parent.replaceChildren();
+          }
+        }
+
+        function showScoreHint(event, delta) {
+          const hint = document.createElement("div");
+          hint.className = "score-hint " + (delta > 0 ? "pos" : "neg");
+          hint.textContent = delta > 0 ? `+${delta}` : `${delta}`;
+          document.body.appendChild(hint);
+          const x =
+            event.clientX ?? (event.touches && event.touches[0]?.clientX) ?? 0;
+          const y =
+            event.clientY ?? (event.touches && event.touches[0]?.clientY) ?? 0;
+          hint.style.left = `${x}px`;
+          hint.style.top = `${y}px`;
+          requestAnimationFrame(() => {
+            hint.style.opacity = "1";
+            hint.style.transform = "translate(-50%, calc(-50% - 30px))";
+          });
+          setTimeout(() => {
+            hint.style.opacity = "0";
+            hint.style.transform = "translate(-50%, calc(-50% - 60px))";
+            setTimeout(() => hint.remove(), 250);
+          }, 500);
+        }
+
+        function gameOver() {
+          playing = false;
+          if (tickTimer) clearInterval(tickTimer);
+          for (const t of clearTimers) clearTimeout(t);
+          clearTimers.clear();
+          spawns.forEach((s) => {
+            s.replaceChildren();
+            s.style.display = "none";
+          });
+
+          setCookie("level3_score", String(score), {
+            path: "/",
+            sameSite: "Lax",
+          });
+          setCookie("level3_add_sum", String(addSum), {
+            path: "/",
+            sameSite: "Lax",
+          });
+          setCookie("level3_cut_sum_abs", String(Math.abs(cutSumNeg)), {
+            path: "/",
+            sameSite: "Lax",
+          });
+          setCookie("level3_03", "true", { path: "/", sameSite: "Lax" });
+
+          go(4);
+          startResultIfNeeded();
+          window.playboard?.updateProgress(100, {
+            stage: "l3-03-over",
+            score,
+            addSum,
+            cutSumAbs: Math.abs(cutSumNeg),
+          });
+        }
+
+        refreshScore();
+        startCountdown();
+      }
+
+      /* ===== Page 4（結算1） ===== */
+      let resultStarted = false;
+      function startResultIfNeeded() {
+        if (resultStarted) return;
+        resultStarted = true;
+
+        handleOrientationMask("rotateMask-04");
+
+        const total = Number(getCookie("level3_score"));
+        if (Number.isNaN(total)) {
+          go(3);
+          return;
+        }
+
+        const addSum = Number(getCookie("level3_add_sum")) || 0;
+        const cutAbs = Number(getCookie("level3_cut_sum_abs")) || 0;
+
+        document.getElementById("num-add").textContent = addSum;
+        document.getElementById("num-cut").textContent = cutAbs;
+        document.getElementById("num-total").textContent = total;
+
+        setCookie("level3_04", "true", { path: "/", sameSite: "Lax" });
+
+        bindPressSwap(
+          "#btn-confirm-4",
+          "./assets/images/check_on.png",
+          "./assets/images/check_off.png",
+          () => {
+            go(5);
+            startResult2IfNeeded();
+          }
+        );
+      }
+
+      /* ===== Page 5（結算2） ===== */
+      let result2Started = false;
+      function startResult2IfNeeded() {
+        if (result2Started) return;
+        result2Started = true;
+
+        handleOrientationMask("rotateMask-05");
+        setCookie("level3_05", "true", { path: "/", sameSite: "Lax" });
+
+        bindPressSwap(
+          "#btn-confirm-5",
+          "./assets/images/check_on.png",
+          "./assets/images/check_off.png",
+          () => {
+            go(6);
+          }
+        );
+      }
+
+      /* 啟動：顯示頁1 + 守門 */
+      go(1);
+      guardFlow();
+
+      /* 最後防線：事件委派（避免任何意外導致未綁成功） */
+      document.addEventListener("click", (e) => {
+        const el = e.target.closest(
+          "#btn-confirm, #btn-confirm-2, #btn-confirm-4, #btn-confirm-5"
+        );
+        if (!el) return;
+        if (el.id === "btn-confirm") {
+          setCookie("level3_01", "true", { path: "/", sameSite: "Lax" });
+          go(2);
+        } else if (el.id === "btn-confirm-2") {
+          setCookie("level3_02", "true", { path: "/", sameSite: "Lax" });
+          go(3);
+          startGameIfNeeded();
+        } else if (el.id === "btn-confirm-4") {
+          go(5);
+          startResult2IfNeeded();
+        } else if (el.id === "btn-confirm-5") {
+          go(6);
+        }
+      });
+
+      // === 重新開始按鈕 ===
+      // 用事件委派處理之後才出現的按鈕（保留你的清除邏輯不變）
+      document.addEventListener("click", (e) => {
+        const target = e.target.closest("#btn-restart, .again-game");
+        if (!target) return;
+
+        // 刪除所有 level3_* cookie（保留你的寫法）
+        const cookies = document.cookie.split(";");
+        cookies.forEach((cookie) => {
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+          if (name.trim().startsWith("level3_")) {
+            document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+          }
+        });
+
+        location.reload();
+      });
+    </script>
+  </body>
+</html>
