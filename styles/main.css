@@ -644,3 +644,24 @@ body {
   background-color: #57a65c; /* 滑過時稍微深一點 */
   transform: scale(1.05);
 }
+
+/* #nextButton 保留原外觀樣式 */
+#nextButton.img-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+#nextButton img {
+  width: 100px; /* 根據實際 UI 調整大小 */
+  height: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 預設隱藏，PlayBoard 顯示時再打開 */
+#nextButton[hidden] {
+  display: none;
+}
