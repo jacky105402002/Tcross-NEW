@@ -1,8 +1,5 @@
 /**
- * PlayBoard 進度控制（最小穩定版）
- * 分數來源：
- *   1) window.foodSharingGame.state.score
- *   2) 退而求其次：cookie level3_score
+ * PlayBoard 進度控制類別（依官方範例，僅補：showNextButton 會移除 hidden）
  */
 class PlayBoardProgress {
   constructor() {
@@ -11,48 +8,36 @@ class PlayBoardProgress {
     this.setupNextButton();
   }
 
+  /** 設定下一步按鈕 */
   setupNextButton() {
     const nextBtn = document.getElementById("nextButton");
-    if (!nextBtn) return;
-
-    // 一個事件就好（跟官方一致）；行動裝置也會派發 click
-    nextBtn.addEventListener("click", () => {
-      this.completePage();
-    });
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        this.completePage();
+      });
+    }
   }
 
+  /** 顯示下一步按鈕（補：同時移除 hidden） */
   showNextButton() {
     const nextBtn = document.getElementById("nextButton");
     if (nextBtn) {
-      // 兩種都做，避免 hidden 還在
-      nextBtn.hidden = false;
+      nextBtn.hidden = false; // ← 補這行，避免 hidden 擋住
       nextBtn.style.display = "block";
     }
   }
 
-  _getScore() {
-    // 遊戲模組
-    if (window.foodSharingGame?.state?.score != null) {
-      const s = Number(window.foodSharingGame.state.score);
-      if (!Number.isNaN(s)) return s;
-    }
-    // 退而求其次：cookie
-    const raw = document.cookie
-      .split("; ")
-      .find((r) => r.startsWith("level3_score="))
-      ?.split("=")
-      .slice(1)
-      .join("=");
-    return Number(raw) || 0;
-  }
-
+  /** 完成頁面 */
   completePage(customScore = null, customData = {}) {
     if (this.isCompleted) return;
-    this.isCompleted = true;
 
+    this.isCompleted = true;
     const timeSpent = Math.round((Date.now() - this.startTime) / 1000);
+
+    // 取得遊戲分數（與範例一致）
+    const game = window.foodSharingGame;
     const finalScore =
-      customScore !== null ? Number(customScore) : this._getScore();
+      customScore !== null ? customScore : game ? game.state.score : 0;
     const maxScore = 100;
     const scorePercentage = Math.min(
       100,
@@ -62,17 +47,17 @@ class PlayBoardProgress {
     const progressData = {
       completed: true,
       score: scorePercentage,
-      timeSpent,
+      timeSpent: timeSpent,
       attempts: 1,
       customData: {
         ...customData,
-        rawScore: finalScore,
-        shareScore: window.foodSharingGame?.state?.score ?? null,
-        dumpScore: window.foodSharingGame?.state?.scoreDump ?? null,
+        shareScore: game ? game.state.score : 0,
+        dumpScore: game ? game.state.scoreDump : 0,
+        totalItems: game ? game.state.score + game.state.scoreDump : 0,
       },
     };
 
-    // 回報給父頁（PlayBoard 會接）
+    // 發送完成訊息給 PlayBoard
     window.parent.postMessage(
       {
         type: "CUSTOM_PAGE_PROGRESS",
@@ -81,22 +66,18 @@ class PlayBoardProgress {
       },
       "*"
     );
-
-    // ---- 本地偵錯（不依賴 alert）：在「自己」視窗也丟一份，方便看 console ----
-    try {
-      window.postMessage(
-        { __debug: "CUSTOM_PAGE_PROGRESS_COMPLETE", data: progressData },
-        "*"
-      );
-    } catch {}
   }
 
+  /** 更新進度（可選） */
   updateProgress(progress, customData = {}) {
     window.parent.postMessage(
       {
         type: "CUSTOM_PAGE_PROGRESS",
         action: "update",
-        data: { progress, customData },
+        data: {
+          progress: progress,
+          customData: customData,
+        },
       },
       "*"
     );
@@ -106,11 +87,4 @@ class PlayBoardProgress {
 // 自動初始化
 window.addEventListener("DOMContentLoaded", () => {
   window.playboard = new PlayBoardProgress();
-
-  // 本地偵錯監聽（看得到就表示 click → completePage() 有執行）
-  window.addEventListener("message", (ev) => {
-    if (ev?.data?.__debug === "CUSTOM_PAGE_PROGRESS_COMPLETE") {
-      console.log("[playboard][debug] complete payload =", ev.data.data);
-    }
-  });
 });
