@@ -665,3 +665,35 @@ body {
 #nextButton[hidden] {
   display: none;
 }
+
+/* 讓第六頁的按鈕一定能點到 */
+#screen-6 .btn-row {
+  position: relative;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+#screen-6 .btn-row .img-btn {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+#screen-6 #nextButton[hidden] {
+  display: none;
+}
+
+#screen-6 #nextButton img {
+  display: block;
+  width: 100px; /* 自行調整 */
+  height: auto;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* 確保旋轉遮罩不會擋到按鈕（只在需要時套用） */
+#rotateMask-06 {
+  pointer-events: none;
+}

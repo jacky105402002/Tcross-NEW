@@ -15,7 +15,24 @@ class PlayBoardProgress {
 
   _setupNextButton() {
     const nextBtn = document.getElementById("nextButton");
-    if (nextBtn) nextBtn.addEventListener("click", () => this.completePage());
+    if (!nextBtn) return;
+
+    const handler = (ev) => {
+      // 有些瀏覽器（特別是行動裝置）會先吃掉 touch 事件，保險起見全擋
+      ev.preventDefault();
+      ev.stopPropagation();
+      // 確認有觸發
+      try {
+        console.log("[playboard] nextButton pressed");
+      } catch {}
+
+      this.completePage();
+    };
+
+    // 綁多種事件，確保觸發
+    ["click", "pointerup", "touchend"].forEach((type) => {
+      nextBtn.addEventListener(type, handler, { passive: false });
+    });
   }
 
   showNextButton() {
