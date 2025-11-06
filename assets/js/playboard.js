@@ -11,7 +11,7 @@ class PlayBoardProgress {
   showNextButton() {
     const nextBtn = document.getElementById("nextButton");
     if (nextBtn) {
-      nextBtn.hidden = false; // ← 關鍵：把 hidden 拿掉
+      nextBtn.hidden = false;
       nextBtn.style.display = "block";
     }
   }
@@ -20,7 +20,7 @@ class PlayBoardProgress {
     this.isCompleted = true;
 
     const timeSpent = Math.round((Date.now() - this.startTime) / 1000);
-    const game = window.foodSharingGame;
+    const game = window.foodSharingGame; // 你的模組例子用這個命名
     const finalScore =
       customScore !== null ? customScore : game ? game.state.score : 0;
     const maxScore = 100;
@@ -29,23 +29,22 @@ class PlayBoardProgress {
       Math.round((finalScore / maxScore) * 100)
     );
 
-    const progressData = {
-      completed: true,
-      score: scorePercentage,
-      timeSpent,
-      attempts: 1,
-      customData: {
-        ...customData,
-        shareScore: game ? game.state.score : 0,
-        dumpScore: game ? game.state.scoreDump : 0,
-        totalItems: game ? game.state.score + game.state.scoreDump : 0,
-      },
-    };
     window.parent.postMessage(
       {
         type: "CUSTOM_PAGE_PROGRESS",
         action: "complete",
-        data: progressData,
+        data: {
+          completed: true,
+          score: scorePercentage,
+          timeSpent,
+          attempts: 1,
+          customData: {
+            ...customData,
+            shareScore: game ? game.state.score : 0,
+            dumpScore: game ? game.state.scoreDump : 0,
+            totalItems: game ? game.state.score + game.state.scoreDump : 0,
+          },
+        },
       },
       "*"
     );
