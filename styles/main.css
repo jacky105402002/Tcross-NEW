@@ -697,3 +697,27 @@ body {
 #rotateMask-06 {
   pointer-events: none;
 }
+
+/* 外層擺前面，避免被旋轉遮罩或其他層蓋住 */
+#screen-6 .btn-row {
+  position: relative;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+/* 取代原本 .img-btn，用背景圖呈現 */
+.btn-next {
+  position: relative; /* 讓 z-index 生效 */
+  z-index: 10000;
+  width: 100px; /* 依實際尺寸調整 */
+  height: 100px;
+  border: 0;
+  background: url("./assets/images/check_off.png") center/contain no-repeat;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+}
+
+#nextButton[hidden] {
+  display: none;
+}
