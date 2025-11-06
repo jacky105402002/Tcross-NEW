@@ -1,11 +1,13 @@
 /**
  * PlayBoard 進度控制
- * - 分數來源：優先讀 window.level3Game.getFinalScore()；沒有就讀 cookie
+ * - 分數來源優先：window.foodSharingGame.state.score → 退而求其次：cookie(level3_score)
  */
 class PlayBoardProgress {
   constructor() {
     this.isCompleted = false;
     this.startTime = Date.now();
+
+    // 等 DOM 就緒後綁 nextButton
     document.addEventListener(
       "DOMContentLoaded",
       () => this._setupNextButton(),
@@ -18,10 +20,10 @@ class PlayBoardProgress {
     if (!nextBtn) return;
 
     const handler = (ev) => {
-      // 有些瀏覽器（特別是行動裝置）會先吃掉 touch 事件，保險起見全擋
+      // 保守處理行動裝置與內嵌情境的事件衝突
       ev.preventDefault();
       ev.stopPropagation();
-      // 確認有觸發
+      // 用 log 取代 alert（沙箱會阻擋 alert）
       try {
         console.log("[playboard] nextButton pressed");
       } catch {}
@@ -29,23 +31,29 @@ class PlayBoardProgress {
       this.completePage();
     };
 
-    // 綁多種事件，確保觸發
     ["click", "pointerup", "touchend"].forEach((type) => {
       nextBtn.addEventListener(type, handler, { passive: false });
     });
   }
 
+  // 顯示下一步按鈕（進到第6頁或遊戲完成時呼叫）
   showNextButton() {
     const nextBtn = document.getElementById("nextButton");
     if (nextBtn) {
-      nextBtn.hidden = false;
-      nextBtn.style.display = "block";
+      nextBtn.hidden = false; // 去掉 hidden 屬性
+      nextBtn.style.display = "block"; // 再保險顯示
     }
   }
 
+  // 讀分數（先讀模組，再讀 cookie）
   _getScoreSafe() {
-    if (window.level3Game?.getFinalScore)
-      return Number(window.level3Game.getFinalScore()) || 0;
+    // 你的遊戲模組：FoodSharingGame
+    if (window.foodSharingGame?.state?.score != null) {
+      const s = Number(window.foodSharingGame.state.score);
+      if (!Number.isNaN(s)) return s;
+    }
+
+    // fallback：cookie
     const raw = document.cookie
       .split("; ")
       .find((r) => r.startsWith("level3_score="))
@@ -55,6 +63,7 @@ class PlayBoardProgress {
     return Number(raw) || 0;
   }
 
+  // 回報完成
   completePage(customScore = null, customData = {}) {
     if (this.isCompleted) return;
     this.isCompleted = true;
@@ -63,12 +72,13 @@ class PlayBoardProgress {
     const rawScore =
       customScore !== null ? Number(customScore) : this._getScoreSafe();
 
-    const maxScore = 100;
+    const MAX = 100; // 規範：換算成百分比
     const score = Math.min(
       100,
-      Math.max(0, Math.round((rawScore / maxScore) * 100))
+      Math.max(0, Math.round((rawScore / MAX) * 100))
     );
 
+    // 發送完成訊息給 PlayBoard（在 iframe 裡由父頁接收）
     window.parent.postMessage(
       {
         type: "CUSTOM_PAGE_PROGRESS",
@@ -85,6 +95,7 @@ class PlayBoardProgress {
     );
   }
 
+  // 進度更新（可選）
   updateProgress(progress, customData = {}) {
     window.parent.postMessage(
       {
@@ -97,32 +108,7 @@ class PlayBoardProgress {
   }
 }
 
-// 自動初始化成全域單例（與範例一致）
+// 全域單例（與範例一致）
 window.addEventListener("DOMContentLoaded", () => {
   if (!window.playboard) window.playboard = new PlayBoardProgress();
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Force show only screen-6 for testing
-  document
-    .querySelectorAll(".screen")
-    .forEach((s) => (s.style.display = "none"));
-  const s6 = document.getElementById("screen-6");
-  if (s6) s6.style.display = "block";
-
-  // Force-show the PlayBoard next button
-  const btn = document.getElementById("nextButton");
-  if (btn) {
-    btn.hidden = false;
-    btn.style.display = "block";
-    btn.addEventListener(
-      "click",
-      (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        alert("nextButton clicked (test)");
-      },
-      { passive: false }
-    );
-  }
 });

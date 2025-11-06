@@ -723,31 +723,27 @@ body {
 }
 
 #screen-6 .btn-row {
-  position: relative;
+  position: fixed; /* ✅ 固定在畫面上，而非相對於內層 */
+  bottom: 6vh; /* 離底部一點距離（視窗高度的6%） */
+  left: 0;
+  right: 0;
   z-index: 9999;
-  pointer-events: auto;
   display: grid;
-  place-items: center;
+  place-items: center; /* 置中 */
+  pointer-events: auto;
 }
 
-/* ✅ 關鍵：這裡不要有空白！ */
+/* ✅ 按鈕樣式保持不變 */
 #nextButton.btn-next {
-  position: relative;
-  top: 700%;
-  z-index: 10000;
-  width: 246px;
+  width: 250px;
   height: 120px;
   border: 0;
   padding: 0;
   cursor: pointer;
+  background: url("../assets/images/check_off.png") center/contain no-repeat;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   display: block;
-  background: url(../assets/images/check_off.png) center / contain no-repeat;
-}
-
-#nextButton[hidden] {
-  display: none !important;
-}
-
-#rotateMask-06 {
-  pointer-events: none;
+  z-index: 10000;
 }
