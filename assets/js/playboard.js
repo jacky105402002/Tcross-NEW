@@ -101,3 +101,28 @@ class PlayBoardProgress {
 window.addEventListener("DOMContentLoaded", () => {
   if (!window.playboard) window.playboard = new PlayBoardProgress();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Force show only screen-6 for testing
+  document
+    .querySelectorAll(".screen")
+    .forEach((s) => (s.style.display = "none"));
+  const s6 = document.getElementById("screen-6");
+  if (s6) s6.style.display = "block";
+
+  // Force-show the PlayBoard next button
+  const btn = document.getElementById("nextButton");
+  if (btn) {
+    btn.hidden = false;
+    btn.style.display = "block";
+    btn.addEventListener(
+      "click",
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        alert("nextButton clicked (test)");
+      },
+      { passive: false }
+    );
+  }
+});

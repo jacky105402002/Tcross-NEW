@@ -721,3 +721,33 @@ body {
 #nextButton[hidden] {
   display: none;
 }
+
+#screen-6 .btn-row {
+  position: relative;
+  z-index: 9999;
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+}
+
+/* ✅ 關鍵：這裡不要有空白！ */
+#nextButton.btn-next {
+  position: relative;
+  top: 700%;
+  z-index: 10000;
+  width: 246px;
+  height: 120px;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+  background: url(../assets/images/check_off.png) center / contain no-repeat;
+}
+
+#nextButton[hidden] {
+  display: none !important;
+}
+
+#rotateMask-06 {
+  pointer-events: none;
+}
