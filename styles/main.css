@@ -666,84 +666,37 @@ body {
   display: none;
 }
 
-/* 讓第六頁的按鈕一定能點到 */
+/* 讓按鈕固定在底部置中、可點擊 */
 #screen-6 .btn-row {
-  position: relative;
-  z-index: 9999;
-  pointer-events: auto;
-}
-
-#screen-6 .btn-row .img-btn {
-  border: 0;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-#screen-6 #nextButton[hidden] {
-  display: none;
-}
-
-#screen-6 #nextButton img {
-  display: block;
-  width: 100px; /* 自行調整 */
-  height: auto;
-  -webkit-user-drag: none;
-  user-select: none;
-}
-
-/* 確保旋轉遮罩不會擋到按鈕（只在需要時套用） */
-#rotateMask-06 {
-  pointer-events: none;
-}
-
-/* 外層擺前面，避免被旋轉遮罩或其他層蓋住 */
-#screen-6 .btn-row {
-  position: relative;
-  z-index: 9999;
-  pointer-events: auto;
-}
-
-/* 取代原本 .img-btn，用背景圖呈現 */
-.btn-next {
-  position: relative; /* 讓 z-index 生效 */
-  z-index: 10000;
-  width: 100px; /* 依實際尺寸調整 */
-  height: 100px;
-  border: 0;
-  background: url("./assets/images/check_off.png") center/contain no-repeat;
-  padding: 0;
-  cursor: pointer;
-  display: block;
-}
-
-#nextButton[hidden] {
-  display: none;
-}
-
-#screen-6 .btn-row {
-  position: fixed; /* ✅ 固定在畫面上，而非相對於內層 */
-  bottom: 6vh; /* 離底部一點距離（視窗高度的6%） */
+  position: fixed;
   left: 0;
   right: 0;
-  z-index: 9999;
+  bottom: 6vh;
   display: grid;
-  place-items: center; /* 置中 */
+  place-items: center;
+  z-index: 9999;
   pointer-events: auto;
 }
 
-/* ✅ 按鈕樣式保持不變 */
+/* 用背景圖呈現「下一步」樣式 */
 #nextButton.btn-next {
+  position: relative;
+  z-index: 10000;
   width: 250px;
   height: 120px;
   border: 0;
   padding: 0;
-  cursor: pointer;
-  background: url("../assets/images/check_off.png") center/contain no-repeat;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
   display: block;
-  z-index: 10000;
+  cursor: pointer;
+  background: url("./assets/images/check_off.png") center/contain no-repeat;
+}
+
+/* hidden 屬性時完全不顯示 */
+#nextButton[hidden] {
+  display: none !important;
+}
+
+/* 若旋轉遮罩會蓋住第 6 頁，關掉指標攔截 */
+#rotateMask-06 {
+  pointer-events: none;
 }

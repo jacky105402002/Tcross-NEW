@@ -91,15 +91,7 @@ class Level3Game {
     if (which === 6) {
       this.setCookie("level3_06", "true");
       window.playboard?.updateProgress(100, { stage: "l3-06-enter" });
-
-      const btn = document.getElementById("nextButton");
-      if (btn) {
-        btn.hidden = false;
-        btn.style.display = "block";
-      }
-
-      // 若 playboard 已初始化，再叫一次（與模組一致）
-      window.playboard?.showNextButton();
+      window.playboard?.showNextButton(); // ← 顯示按鈕（照範例）
     }
   }
   guardFlow() {

@@ -194,6 +194,7 @@
     <section id="screen-6" class="screen" data-screen="l3-06-result-3">
       <div class="game-wrap bg-end-03">
         <div class="btn-row">
+          <!-- 與模組約定的按鈕：預設隱藏，進到第6頁再顯示 -->
           <button
             id="nextButton"
             class="btn-next"
@@ -212,8 +213,7 @@
     <!-- <button id="nextButton" hidden>下一步</button> -->
 
     <!-- 進度控制（只處理 PlayBoard 通訊 & 下一步） -->
-    <script src="assets/js/playboard.js"></script>
-    <!-- 遊戲流程與計分（整合你原本兩段 script） -->
-    <script src="assets/js/game.js"></script>
+    <script src="./assets/js/playboard.js" defer></script>
+    <script src="./assets/js/game.js" defer></script>
   </body>
 </html>
